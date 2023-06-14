@@ -85,7 +85,8 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
     float cellWidth = mapWidth / nCellsWidth;
     float cellHeight = mapHeight / nCellsHeight;
 
-    //estructura matriz N² x 2
+    //estructura matriz N² x 2 ... se cambió a array NxN guarda celvalues más otro array NxN guarda posiciones. 
+    //operaciones como 'swap' deben hacerse a los dos arrays
     int N = nCellsWidth*nCellsHeight;
     
     //restrucutrando el codigo
@@ -98,9 +99,16 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
     }
 
     //for(int i=0;i<N;i++){printf("%i\t",(int)celvalues[i]);}
+
     
     
-    //1, SIN PRE-ORDENACION
+    /* 
+    ***********************
+    1. SIN PRE-ORDENACION
+    ***********************
+    */
+
+    //se crea copia de celvalues
     float *celvalues1  = new float [N];
     for(int i=0; i<N;i++){
         celvalues1[i] = celvalues[i];
@@ -134,7 +142,11 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
     t.parar();
 
 
-    //2, ORDENACION POR FUSION
+    /* 
+    ***********************
+    2. ORDENACION POR FUSION
+    ***********************
+    */
     float *celvalues2  = new float [N];
     for(int i=0; i<N;i++){
         posiciones[i]= i; //reseteamos las posiciones
@@ -162,8 +174,11 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
     }
     t2.parar();
     
-    
-    //3 ORDENACION RAPIDA
+    /* 
+    ***********************
+    3. ORDENACION RAPIDA
+    ***********************
+    */
     float *celvalues3  = new float [N];
     for(int i=0; i<N;i++){
         posiciones[i]= i; //reseteamos las posiciones
@@ -191,8 +206,63 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
     }
     t3.parar();
 
+    /* 
+    ***********************
+    4. ORDENACION POR MONTICULOS
+    ***********************
+    */
+    //para facilitar el guardado de posiciones usamos un vector de pares
+    std::vector<std::pair<float,int>> celvalues4;
+    for(int i=0; i<N; i++){
+      celvalues4.emplace_back(celvalues[i],i);
+    }
+    cronometro t4;
+    t4.activar();
+    //creamos el monticulo 'inverso'con la funcion make_heap y el parametro greater
+    std::make_heap(celvalues4.begin(), celvalues4.end(), std::greater<std::pair<float,int>>());
+    //se ordena en orden decreciente
+    std::sort_heap(celvalues4.begin(), celvalues4.end(), std::greater<std::pair<float,int>>());
 
-    //4 ORDENACION POR MONTICULOS
+    currentDefense = defenses.begin();
+    i = 0;
+    while(currentDefense != defenses.end()) {
+      row = (int)celvalues4[i].second/nCellsHeight;
+      col = (int)celvalues4[i].second%nCellsWidth;
+      posx= col * cellWidth + cellWidth * 0.5f;
+      posy= row * cellHeight + cellHeight * 0.5f;
+      if(factibilidad(posx, posy, mapWidth,mapHeight,currentDefense,defenses,obstacles)){
+        (*currentDefense)->position.x = posx;
+        (*currentDefense)->position.y = posy;
+        (*currentDefense)->position.z = 0;
+        ++currentDefense;
+
+      }
+      i++;
+    }
+    t4.parar();
+
+
+    //NECESITO COMPROBAR QUE MIS ALG DE ORDENACION DAN EL MISMO RESULTADO / FUNCIONAN
+    /*
+    float *celprueba1  = new float [N];
+    for(int i=0; i<N;i++){
+      posiciones[i]= i; //reseteamos las posiciones
+      celprueba1[i] = celvalues[i];
+    }
+    float *celprueba2  = new float [N];
+    for(int i=0; i<N;i++){
+      posiciones[i]= i; //reseteamos las posiciones
+      celprueba2[i] = celvalues[i];
+    }
+    */
+    for(int i=0; i<N;i++){
+      if(celvalues2[i] != celvalues3[i] || celvalues2[i] != celvalues4[i].first ){
+        printf("___________error: sort no es igual______________\n");
+        //exit;
+      }
+    }
+
+
 
 long int r = 1;
   /*
@@ -217,7 +287,7 @@ long int r = 1;
     c.parar();
     std::cout << (nCellsWidth * nCellsHeight) << '\t' << c.tiempo() / r << '\t' << c.tiempo()*2 / r << '\t' << c.tiempo()*3 / r << '\t' << c.tiempo()*4 / r << std::endl;
     */
-   std::cout << (N) << '\t' << t.tiempo()/ r << '\t' << t2.tiempo() / r << '\t' << t3.tiempo() / r << '\t' << "1"<< std::endl;
+   std::cout << (N) << '\t' << t.tiempo()/ r << '\t' << t2.tiempo() / r << '\t' << t3.tiempo() / r << '\t' << t4.tiempo() / r << std::endl;
 }
 
 void merge(float *array, int izq, int medio, int der, int* indices)
