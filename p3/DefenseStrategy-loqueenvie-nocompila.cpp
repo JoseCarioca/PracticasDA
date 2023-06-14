@@ -1,7 +1,5 @@
 // ###### Config options ################
 
-
-
 // #######################################
 
 #define BUILDING_DEF_STRATEGY_LIB 1
@@ -81,13 +79,13 @@ List<Defense*> defenses, List<Object*> obstacles){
 
 void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight
               , List<Object*> obstacles, List<Defense*> defenses) {
-                
+
     float cellWidth = mapWidth / nCellsWidth;
     float cellHeight = mapHeight / nCellsHeight;
 
     //estructura matriz N² x 2
     int N = nCellsWidth*nCellsHeight;
-    
+
     //restrucutrando el codigo
     int *posiciones = new int [N];
     float *celvalues  = new float [N];
@@ -97,81 +95,12 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
         , nCellsWidth, nCellsHeight ,mapWidth, mapHeight, obstacles, defenses);// i/ncellswidth=row y i%ncellsheight=col
     }
 
-    //for(int i=0;i<N;i++){printf("%i\t",(int)celvalues[i]);}
-    
-    
-    //1, SIN PRE-ORDENACION
-    float *celvalues1  = new float [N];
-    for(int i=0; i<N;i++){
-        celvalues1[i] = celvalues[i];
-    }
-    cronometro t;
-    t.activar();
 
-    List<Defense*>::iterator currentDefense = defenses.begin();
-    float posx, posy; int row, col, i = 0;
-    while(currentDefense != defenses.end()) {
-      //maximo valor del vector
-      int max = 0;
-      for(int i = 0; i<N; i++){
-        if(celvalues1[i] > celvalues1[max]){
-          max = i;
-        }
-      }
-      row = (int)posiciones[max]/nCellsHeight;
-      col = (int)posiciones[max]%nCellsWidth;
-      posx= col * cellWidth + cellWidth * 0.5f;
-      posy= row * cellHeight + cellHeight * 0.5f;
-      celvalues1[max] = -1; //invalidamos valor para proximas iteraciones - pop en listas.
-      if(factibilidad(posx, posy, mapWidth,mapHeight,currentDefense,defenses,obstacles)){
-          (*currentDefense)->position.x = posx;
-          (*currentDefense)->position.y = posy;
-          (*currentDefense)->position.z = 0;
-          ++currentDefense;
-
-        }
-    }//FIN 1
-    t.parar();
-
-
-    //2, ORDENACION POR FUSION
-    float *celvalues2  = new float [N];
-    for(int i=0; i<N;i++){
-        posiciones[i]= i; //reseteamos las posiciones
-        celvalues2[i] = celvalues[i];
-    }
-    cronometro t2;
-    t2.activar();
-    merge_sort(celvalues2,0,N,posiciones);
-
-    currentDefense = defenses.begin();
-    i = 0;
-    while(currentDefense != defenses.end()) {
-      row = (int)posiciones[i]/nCellsHeight;
-      col = (int)posiciones[i]%nCellsWidth;
-      posx= col * cellWidth + cellWidth * 0.5f;
-      posy= row * cellHeight + cellHeight * 0.5f;
-      if(factibilidad(posx, posy, mapWidth,mapHeight,currentDefense,defenses,obstacles)){
-        (*currentDefense)->position.x = posx;
-        (*currentDefense)->position.y = posy;
-        (*currentDefense)->position.z = 0;
-        ++currentDefense;
-
-      }
-      i++;
-    }
-    t2.parar();
-    
-    
     //3 ORDENACION RAPIDA
-    float *celvalues3  = new float [N];
-    for(int i=0; i<N;i++){
-        posiciones[i]= i; //reseteamos las posiciones
-        celvalues3[i] = celvalues[i];
-    }
-    cronometro t3;
-    t3.activar();
-    ordenacion_rapida(celvalues3,0,N,posiciones);
+
+    //cronometro t3;
+    //t3.activar();
+    ordenacion_rapida(celvalues,0,N,posiciones);
 
     currentDefense = defenses.begin();
     i = 0;
@@ -189,35 +118,9 @@ void DEF_LIB_EXPORTED placeDefenses3(bool** freeCells, int nCellsWidth, int nCel
       }
       i++;
     }
-    t3.parar();
+    //t3.parar();
 
 
-    //4 ORDENACION POR MONTICULOS
-
-long int r = 1;
-  /*
-
-
-
-	cronometro c;
-    long int r = 0;
-    c.activar();
-    do {
-		List<Defense*>::iterator currentDefense = defenses.begin();
-		while(currentDefense != defenses.end()) {
-
-			(*currentDefense)->position.x = ((int)(_RAND2(nCellsWidth))) * cellWidth + cellWidth * 0.5f;
-			(*currentDefense)->position.y = ((int)(_RAND2(nCellsHeight))) * cellHeight + cellHeight * 0.5f;
-			(*currentDefense)->position.z = 0;
-			++currentDefense;
-		}
-
-		++r;
-    } while(c.tiempo() < 1.0);
-    c.parar();
-    std::cout << (nCellsWidth * nCellsHeight) << '\t' << c.tiempo() / r << '\t' << c.tiempo()*2 / r << '\t' << c.tiempo()*3 / r << '\t' << c.tiempo()*4 / r << std::endl;
-    */
-   std::cout << (N) << '\t' << t.tiempo()/ r << '\t' << t2.tiempo() / r << '\t' << t3.tiempo() / r << '\t' << "1"<< std::endl;
 }
 
 void merge(float *array, int izq, int medio, int der, int* indices)
@@ -286,7 +189,7 @@ void merge_sort(float *array, int izq, int der, int * indices)
 
         merge_sort(array, izq, medio,indices);
         merge_sort(array, medio + 1, der,indices);
-        
+
         merge(array, izq, medio, der, indices);
     }
 }
