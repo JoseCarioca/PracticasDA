@@ -1,0 +1,14 @@
+\begin{lstlisting}
+float cellValue(int row, int col, bool** freeCells, int nCellsWidth, int nCellsHeight
+	, float mapWidth, float mapHeight, List<Object*> obstacles, List<Defense*> defenses) {
+
+    float cellWidth = mapWidth / nCellsWidth; 
+    float cellHeight = mapHeight / nCellsHeight; 
+    float centro_x = col*cellWidth+cellWidth*0.5f;
+    float centro_y = row*cellHeight+cellHeight*0.5f;
+    float mitad = mapWidth/2;
+    float resultado = ((1000)/(abs(centro_x - mitad) + abs(centro_y - mitad) + 0.001f)); //offset para que no de 0
+    if(!freeCells) resultado = 0.0f;
+	return resultado; 
+}
+\end{lstlisting}

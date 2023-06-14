@@ -1,0 +1,23 @@
+\begin{lstlisting}
+void ordenacion_rapida(float *array, int izq, int der, int *indices){
+  int i = izq;
+  int j = der;
+  float aux = *(array + izq); //pivote
+  int ind_aux = *(indices + izq);
+
+  if(izq < der){
+    while(i<j){
+      while(*(array + j) <= aux && i<j){j--;}
+      *(array + i) = *(array + j);
+       *(indices + i) = *(indices + j);
+      while(*(array + i)>= aux && i<j){i++;}
+      *(array + j)=*(array + i);
+      *(indices + j)=*(indices+ i);
+    }
+    *(array + i) = aux;
+    *(indices + i) = ind_aux;
+    ordenacion_rapida(array,izq,i-1,indices);
+    ordenacion_rapida(array,j+1,der,indices);
+  }
+}
+\end{lstlisting}

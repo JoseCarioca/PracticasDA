@@ -1,0 +1,15 @@
+\begin{lstlisting}
+//funcion que da valor a las defensas
+int DefensesValue(List<Defense*>::iterator defensa){
+    float rango = (*defensa)->range;
+    float dispersion = (*defensa)->dispersion;
+    float dmg = (*defensa)->damage;
+    float dps = (*defensa)->attacksPerSecond;
+    float vida = (*defensa)->health;
+    float coste = (*defensa)->cost;
+    
+    float resultado = (vida*2+dmg*1000+dps*5000+rango*30);
+
+    return static_cast<int>(resultado);
+}
+\end{lstlisting}

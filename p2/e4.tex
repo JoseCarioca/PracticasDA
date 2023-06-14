@@ -1,0 +1,15 @@
+\begin{lstlisting}
+//recuperacion de combinacion optima
+    int i = size-1;
+    int j = dinero-1;
+    while(i>0 && j>0){
+        if(tabla[i][j] == tabla[i-1][j]);
+        else {
+            if(j-costes[i] > 0){
+                selectedIDs.push_back(i+1);
+                j-= costes[i];
+            }
+        }
+        i--;
+    }
+\end{lstlisting}

@@ -1,0 +1,50 @@
+\begin{lstlisting}
+void DEF_LIB_EXPORTED placeDefenses(bool** freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight
+              , std::list<Object*> obstacles, std::list<Defense*> defenses) {
+
+    float cellWidth = mapWidth / nCellsWidth;
+    float cellHeight = mapHeight / nCellsHeight;
+
+		int N = nCellsWidth*nCellsHeight;
+		float** valores = new float* [N];
+		for(int i=0; i<N;i++){
+			valores[i] = new float[2]; // [][0] = pos [][1] valores cellValue
+			valores[i][0] = i;
+			valores[i][1] = cellValue(i/nCellsWidth, i%nCellsWidth, freeCells, cellWidth,cellHeight
+, mapWidth, mapHeight, obstacles, defenses); // i/ncellswidth=row y i%ncellsheight=col
+		}
+
+		int aux0; float aux1;
+		for(int i=0;i<N-1;i++){
+			for(int j=0; j<N-1;j++){
+				if(valores[j][1]<valores[j+1][1]){
+					aux0 = valores[j][0];
+					aux1 = valores[j][1];
+					valores[j][0] = valores[j+1][0];
+					valores[j][1] = valores[j+1][1];
+					valores[j+1][0] = aux0;
+					valores[j+1][1] = aux1;
+				}
+			}
+		} //preordena
+		
+
+    List<Defense*>::iterator currentDefense = defenses.begin();
+		float posx, posy; int row, col, i = 0;
+
+    while(currentDefense != defenses.end()) {
+			row = (int)valores[i][0]/nCellsHeight;
+			col = (int)valores[i][0]%nCellsWidth;
+			posx= col * cellWidth + cellWidth * 0.5f;
+			posy= row * cellHeight + cellHeight * 0.5f;
+			if(factibilidad(posx, posy, mapWidth,mapHeight,currentDefense,defenses,obstacles)){
+				(*currentDefense)->position.x = posx;
+				(*currentDefense)->position.y = posy;
+				(*currentDefense)->position.z = 0;
+				++currentDefense;
+
+			}
+			i++;
+}
+
+\end{lstlisting}

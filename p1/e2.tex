@@ -1,0 +1,31 @@
+
+Recibimos la posicion x,y del centro de la celda que evaluamos además del tamaño del mapa junto con la lista de denfensas y la defensa que queremos colocar.
+La funcion devuelve True en caso de que sea factible, False en caso contrario
+
+\begin{lstlisting}
+bool factibilidad(float x, float y, float mapWidth, float mapHeight, List<Defense*>::iterator defensa,
+List<Defense*> defenses, List<Object*> obstacles){
+	bool esFactible = true;
+	
+	float radio = (*defensa)->radio;
+
+	if(x<radio || y<radio || x + radio > mapWidth || y + radio > mapHeight){ esFactible = false;}
+
+	List<Object*>::iterator currentObstacle = obstacles.begin();
+	while(esFactible && currentObstacle != obstacles.end()){
+		Vector3 diferencia = Vector3(x,y,0) - (*currentObstacle)->position;
+		if(diferencia.length() < radio + (*currentObstacle)->radio) {esFactible = false;}
+		++currentObstacle;
+	}
+
+	List<Defense*>::iterator currentDefense = defenses.begin();
+	while(esFactible && (*currentDefense)->id != (*defensa)->id){
+		Vector3 diferencia = Vector3(x,y,0) - (*currentDefense)->position;
+		if(diferencia.length() < radio + (*currentDefense)->radio) {esFactible = false;}
+		++currentDefense;
+	}
+	return esFactible;
+}
+\end{lstlisting}
+
+

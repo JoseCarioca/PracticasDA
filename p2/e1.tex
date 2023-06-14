@@ -1,0 +1,9 @@
+
+$$f(defensa)=\frac{2\cdot vida+1000\cdot damage+5000\cdot aps+30\cdot rango}{coste} $$
+
+Para determinar el valor defensivo de nuetras defensas debemos entender o presuponer cuales son los atributos positivos y negativos para las mismas, además de conocer sus valores medios o por defecto para entender su escala. 
+Dicho esto la formula consiste en una división donde como numerador encontramos la suma de atributos que aportan valor defensivo y como denomiador la suma de atributos que restan, siendo este el coste.
+Los valores con aleatoriedad 0 de cada atributo son:
+Vida = 500, Daño = 5, AtaquePorSegundo = 1, Rango = 30, Coste = 100
+Los atributos del numerador son escalados por una constante multiplicativa equiparandolos entre ellos y dando más valor a los atributos que considero más importantes que en el siguiente orden son:
+$$ Damage= APS > Vida > Rango$$
