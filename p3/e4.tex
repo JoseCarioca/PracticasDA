@@ -1,1 +1,54 @@
-Escriba aquí su respuesta al ejercicio 4.
+Se hacen algunas sencillas pruebas de caja negra, el código no relevante o repetitivo se obvia.
+
+\begin{lstlisting}
+void cajanegra(){
+  //aqui se realizaran las pruebas con diferentes inputs
+  float p02[] = {}; int i02[] = {};
+  float p1 = 1;  int i1 = 1; 
+  float p2[] = {0,0,0,0,0,0,0}; int i2[] = {0,1,2,3,4,5,6};
+  float p3[] = {-1,2,3,4,5,6,7,8}; int i3[] = {0,1,2,3,4,5,6,7}; 
+  float p4[] = {8,7,6,5,4,3,2,1}; int i4[] = {0,1,2,3,4,5,6,7}; 
+  //[...] mas inicializaciones 
+  std::vector<std::pair<float,int>> p44;
+  for(int i=0; i<8; i++){
+      p44.emplace_back(p4[i],i);
+  }
+
+  //por fusion
+  merge_sort(&p1,0,0,&i1); //un unico elemento
+  printf("%f\n",p1);
+  merge_sort(p2,0,6,i2); //elementos repetidos
+  for (int i = 0 ; i <*(&p2 + 1) - p2; i++) 
+    std::cout << p2[i] << '\t' << i2[i] << std::endl;
+  printf("\n");
+  merge_sort(p3,0,7,i3); //ordenado ascendentemente
+  for (int i = 0 ; i <*(&p3 + 1) - p3; i++) 
+    std::cout << p3[i] << '\t' << i3[i] << std::endl;
+  printf("\n");
+  merge_sort(p4,0,7,i4); //ordenado descendentemente
+  for (int i = 0 ; i <*(&p4 + 1) - p4; i++) 
+    std::cout << p4[i] << '\t' << i4[i] << std::endl;
+  printf("\n\n");
+
+  //rapida
+  //[...] igual que fusion
+  //monticulo
+  ordenar_monticulo(p14); //un unico elemento
+  printf("%f %i\n",p14[0].first, p14[0].second);
+  ordenar_monticulo(p24);  //elementos repetidos
+  for (int i = 0 ; i <7; i++) 
+    std::cout << p24[i].first << '\t' << p24[i].second << std::endl;
+  printf("\n");
+  ordenar_monticulo(p34); //ordenado ascendentemente
+  for (int i = 0 ; i <8; i++) 
+    std::cout << p34[i].first << '\t' << p34[i].second << std::endl;
+  printf("\n");
+  ordenar_monticulo(p44); //ordenado descendentemente
+  for (int i = 0 ; i <8; i++) 
+    std::cout << p44[i].first << '\t' << p44[i].second << std::endl;
+  printf("\n\n");
+
+}
+\end{lstlisting}
+
+\vspace{5mm}
