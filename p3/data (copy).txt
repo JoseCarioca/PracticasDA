@@ -11,3 +11,54 @@
 10816	0.076202	0.013037	0.010805	0.014489
 
 https://paste.ubuntu.com/p/hxGj2sQtcX/
+
+//RAPIDA
+68.50	Base raided!
+144.60	Base raided!
+238.41	Base raided!
+105.50	Base raided!
+179.80	Base raided!
+336.81	Base raided!
+314.81	Base raided!
+240.11	Base raided!
+291.51	Base raided!
+317.61	Base raided!
+37.10	Base raided!
+73.00	Base raided!
+136.60	Base raided!
+104.10	Base raided!
+127.10	Base raided!
+110.60	Base raided!
+312.51	Base raided!
+104.70	Base raided!
+227.60	Base raided!
+258.21	Base raided!
+47.10	Base raided!
+140.30	Base raided!
+600.00	Base defended!
+
+//MONTICULO
+55.00	Base raided!
+97.00	Base raided!
+222.00	Base raided!
+139.00	Base raided!
+105.60	Base raided!
+33.50	Base raided!
+93.50	Base raided!
+241.61	Base raided!
+174.30	Base raided!
+553.21	Base raided!
+31.50	Base raided!
+39.00	Base raided!
+174.60	Base raided!
+73.60	Base raided!
+99.50	Base raided!
+206.00	Base raided!
+90.00	Base raided!
+78.50	Base raided!
+152.50	Base raided!
+96.50	Base raided!
+67.60	Base raided!
+152.10	Base raided!
+323.11	Base raided!
+

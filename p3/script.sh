@@ -3,6 +3,6 @@ niveles=(1324 1625 1854 2356 2856 3456 3552 3728 4356 4592 1111 1333 1555 1888 2
 for j in "${niveles[@]}"
 do
 	#echo "nivel: $j"
-    ../simulador/simulador -level $j -silent #-v #comentar v
+    ../simulador/simulador -level $j #-v #comentar v
     #mv game.ppm $j.ppm #comentar linea si fuera necesario
 done
