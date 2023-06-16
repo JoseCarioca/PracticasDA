@@ -144,6 +144,24 @@ void DEF_LIB_EXPORTED calculateAdditionalCost(float** additionalCost
    
 }
 
+AStarNode* extrae_mejor(std::list<AStarNode*> abiertas){//ya veer
+    List<AStarNode*>::iterator it=abiertas.begin();
+    int count = 0;
+    AStarNode *mejor;
+    //AStarNode*;
+    float min = INF_F; float aux;
+    while(it != abiertas.end()){
+        aux = (*it)->F;
+        if(aux < min){
+            min = aux;
+            mejor = *it; //count;
+        }
+        it++;
+        count++;
+    }
+    return mejor;
+} 
+
 void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
                    , int cellsWidth, int cellsHeight, float mapWidth, float mapHeight
                    , float** additionalCost, std::list<Vector3> &path) {
@@ -152,29 +170,36 @@ void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
     float cellHeight = mapHeight / cellsHeight;
     //notas: cellsWidth es nº casillas de ancho, mapWidth tam en u de ancho. y su division el tam de una casilla
 
-    /*
+    
     int maxIter = cellsHeight*cellsWidth;
     List<AStarNode *> abiertas;
     abiertas.push_back(originNode);
     List<AStarNode *> cerradas; // vacia I guess
     AStarNode *c = originNode;
-    while (c != targetNode && maxIter > 0)
+    while (c != targetNode &&  !abiertas.empty() && maxIter > 0)
     {
         float min = INF_F; // maximo posible para un float jsjs
         // AStarNode* k = (); //no recuerdo que es
         AStarNode *o = NULL; // no se pa que sirve
-        for (List<AStarNode *>::iterator it = c->adjacents.begin(); it != c->adjacents.end(); ++it)
-        {
-        }
+
+        //extrae mejor 
+        c = extrae_mejor(abiertas);
+        std::cout << c->position.x << " "  << c->position.y << " " << c->F << " " << c->G << " " << c->H << std::endl;
+        abiertas.remove(c); //se elimina mejor de abiertas
+        cerradas.push_back(c); //add current to closed
+
+
+
+        
     }
-    */
+    
 
     float ** camino = new float*[cellsHeight];
     for (int i = 0; i < cellsHeight; ++i) {
         camino[i] = new float[cellsWidth]{};
     }
 
-    int maxIter = 100; 
+    maxIter = 100; 
     AStarNode* current = originNode;
     printf("height:%i width:%i\n",cellsHeight,cellsWidth);
     while(current != targetNode && maxIter > 0) { // @todo ensure current and target are connected
@@ -222,21 +247,5 @@ void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
 }
 //Esta funcion es feisima
 //
-int extrae_mejor(std::list<AStarNode*> abiertas){//ya veer
-    List<AStarNode*>::iterator it=abiertas.begin();
-    int count = 0;
-    int mejor;
-    //AStarNode*;
-    float min = INF_F; float aux;
-    while(it != abiertas.end()){
-        aux = (*it)->F;
-        if(aux < min){
-            min = aux;
-            mejor = count;
-        }
-        it++;
-        count++;
-    }
-    return -1;
-} 
+
 
