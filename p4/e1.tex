@@ -1,1 +1,6 @@
-Escriba aquí su respuesta al ejercicio 1.
+Este algoritmo devuelve el camino más óptimo de un Nodo A a un Nodo B, siendo estos celdas de un tablero NxN. Inicialmente se calculan los costes asociados al mapa, es decir, los obstáculos que impiden el paso por esas casillas o las defensas que lo dificultan.
+
+En el caso de los obstáculos se decide un coste de INF_F para su posicion y la de su radio para determinar estas casillas como no válidas y en el caso de las defensas se decidió darles un valor de coste positivo en las cercacias salvo para la de extracción. Ésta última interpretación se realizó con la idea de poder encontrar un camino hasta el objetivo esquivando a las defensas, pero se terminó descartando por la proximidad a la misma. 
+
+Para el algoritmo de búsqueda A* he utilizado dos listas de tipo AStarNode para las listas de 'Abierto' y 'Cerrado'. No he implementado una cola de prioridad, en su defecto he usado una función que devuelve el nodo con menor valor de F. Para H se utiliza la distancia de Manhattan.
+

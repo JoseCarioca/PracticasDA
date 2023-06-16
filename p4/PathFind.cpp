@@ -37,13 +37,12 @@ void DEF_LIB_EXPORTED calculateAdditionalCost(float** additionalCost
 
     for(int i = 0 ; i < cellsHeight ; ++i) {
         for(int j = 0 ; j < cellsWidth ; ++j) {
-            Vector3 cellPosition = cellCenterToPosition(i, j, cellWidth, cellHeight);
             float cost = 0;
             if( (i+j) % 2 == 0 ) {
                 cost = cellWidth * 100;
             }
             
-            additionalCost[i][j] = cost;
+            additionalCost[i][j] = 0;
         }
     }
 }
@@ -75,7 +74,7 @@ void DEF_LIB_EXPORTED NOcalculateAdditionalCost(float** additionalCost
         int col, row;
         positionToCell((*currentObstacle)->position,row,col,cellWidth,cellHeight);
         
-    
+
         tam = radio/cellWidth; 
         casillas = ceil(tam); // numero de casillas horizontales desde el centro que quedan ocupadas
       
@@ -128,7 +127,7 @@ void fgh(AStarNode* n, const AStarNode* origin, const AStarNode* target){
 
 }
 
-AStarNode* extrae_mejor(std::list<AStarNode*> abiertas){//ya veer
+AStarNode* extrae_mejor(std::list<AStarNode*>& abiertas){//ya veer
     List<AStarNode*>::iterator it=abiertas.begin();
     AStarNode *mejor;
     //AStarNode*;
@@ -160,11 +159,7 @@ void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
     //notas: cellsWidth es nº casillas de ancho, mapWidth tam en u de ancho. y su division el tam de una casilla
     
     int maxIter = 0; //no se si usarlo
-    float ** camino = new float*[cellsHeight]; 
-
-    for (int i = 0; i < cellsHeight; ++i) {
-        camino[i] = new float[cellsWidth]{};
-    }
+    
 
     List<AStarNode *> abiertas;
     abiertas.push_front(originNode);
@@ -177,21 +172,26 @@ void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
     float coste; //para guardar coste de distancia y obstaculos
     int i,j;
     
-    while (c != targetNode &&  !abiertas.empty())
+    while (!abiertas.empty() && maxIter < 9999)
     {
-
-        float min = INF_F; // maximo posible para un float jsjs
-        // AStarNode* k = (); //no recuerdo que es
-        //AStarNode *o = NULL; // no se pa que sirve
 
         //extrae mejor 
         c = extrae_mejor(abiertas);
         abiertas.remove(c); //se elimina mejor de abiertas
         cerradas.push_back(c); //add current to closed
-        //IFFFFFFF
-        path.push_back(c->position);
-        
-        for(List<AStarNode*>::iterator it = c->adjacents.begin(); it != c->adjacents.end(); ++it){
+       
+        if(c == targetNode){
+            int salida = 1000;
+            while(c != originNode && salida >0){
+                path.push_front(c->position);
+                c = c->parent;
+                salida--;
+                if(salida == 0){printf("no encontró caminino\n");}
+            }
+        }else{
+
+            for(List<AStarNode*>::iterator it = c->adjacents.begin(); it != c->adjacents.end(); ++it){
+            
             positionToCell((*it)->position,i,j,cellWidth,cellHeight);
             
             coste = c->G + cellWidth; //sabemos que tam celda de ancho y largo son iguales
@@ -209,18 +209,26 @@ void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
                 //set priority quere rank to g(it) + h(it)
                 (*it)->parent = c;
             }
+            }
         }
+        
+        maxIter++;
+        if (maxIter > 9000){printf("%ijoe \n",maxIter);}
+        //
     }
     /*
+    printf("\n\n");
+    maxIter = 0;
     //recupera camino
     if(c == targetNode) {
         auto n = targetNode;
-        while(n != originNode){
+        while(n != originNode && maxIter>-500){
             path.push_back(c->position);
             n = n->parent;
-    }
-    
-}*/
+            maxIter--;
+            printf("%i \n",maxIter);
+        }   
+    }*/
 }
 
 

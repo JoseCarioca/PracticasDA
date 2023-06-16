@@ -1,1 +1,58 @@
-Escriba aquí su respuesta al ejercicio 2.
+\begin{lstlisting}
+void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
+                   , int cellsWidth, int cellsHeight, float mapWidth, float mapHeight
+                   , float** additionalCost, std::list<Vector3> &path) {
+    
+    float cellWidth = mapWidth / cellsWidth;
+    float cellHeight = mapHeight / cellsHeight;
+    
+    List<AStarNode *> abiertas;
+    abiertas.push_front(originNode);
+    List<AStarNode *> cerradas; // vacia
+    AStarNode *c = originNode;
+    //fgh manualmente
+    c->G = 0.0f; 
+    c->H = _sdistance(c->position, targetNode->position);
+    c->F = c->H;
+    float coste; //para guardar coste de distancia y obstaculos
+    int i,j;
+    
+    while (!abiertas.empty()  )
+    {
+        //extrae mejor 
+        c = extrae_mejor(abiertas);
+        abiertas.remove(c); //se elimina mejor de abiertas
+        cerradas.push_back(c); //add current to closed
+       
+        if(c == targetNode){
+            while(c != originNode){
+                path.push_back(c->position);
+                c = c->parent;
+            }
+        }else{
+
+            for(List<AStarNode*>::iterator it = c->adjacents.begin(); it != c->adjacents.end(); ++it){
+            
+            positionToCell((*it)->position,i,j,cellWidth,cellHeight);
+            
+            coste = c->G + cellWidth; //sabemos que tam celda de ancho y largo son iguales
+            (*it)->H = additionalCost[i][j] + _sdistance((*it)->position, targetNode->position) ;
+            (*it)->F = (*it)->G + (*it)->H;
+            if( (dentrode(abiertas,(*it)) || dentrode(cerradas,(*it)) ) && coste < (*it)->G){
+                abiertas.remove(*it);
+            }
+            if( !dentrode(abiertas,(*it)) && !dentrode(cerradas,(*it)) )  
+            {
+                (*it)->G = coste;
+                abiertas.push_back(*it);
+                (*it)->parent = c;
+            }
+            }
+        }
+        
+    }
+
+}
+\end{lstlisting}
+
+\vspace{5mm}
