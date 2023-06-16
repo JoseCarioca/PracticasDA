@@ -23,50 +23,32 @@ Vector3 cellCenterToPosition(int i, int j, float cellWidth, float cellHeight){
 
 void positionToCell(const Vector3 pos, int &i_out, int &j_out, float cellWidth, float cellHeight){ i_out = (int)(pos.y * 1.0f/cellHeight); j_out = (int)(pos.x * 1.0f/cellWidth); } 
 
-void showcosts(float** additionalCost,int cellsWidth, int cellsHeight){
-    for (int i = 0; i < cellsHeight; ++i)
-    {
-        for (int j = 0; j < cellsWidth; ++j)
-        {
-
-            printf("%-3.0f ", additionalCost[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n\n\n");
-}
 
 //distancia de Manhattan
 float manhattan(AStarNode* current, AStarNode* target){
     return _sdistance(current->position, target->position);
 }
+void DEF_LIB_EXPORTED calculateAdditionalCost(float** additionalCost
+                   , int cellsWidth, int cellsHeight, float mapWidth, float mapHeight
+                   , List<Object*> obstacles, List<Defense*> defenses) {
 
-//la copio aqui para mirar unas cosas
-bool factibilidad(float x, float y, float mapWidth, float mapHeight, List<Defense*>::iterator defensa,
-List<Defense*> defenses, List<Object*> obstacles){
-	bool esFactible = true;
+    float cellWidth = mapWidth / cellsWidth;
+    float cellHeight = mapHeight / cellsHeight;
 
-	float radio = (*defensa)->radio;
-
-	if(x<radio || y<radio || x + radio > mapWidth || y + radio > mapHeight){ esFactible = false;}
-
-	List<Object*>::iterator currentObstacle = obstacles.begin();
-	while(esFactible && currentObstacle != obstacles.end()){
-		Vector3 diferencia = Vector3(x,y,0) - (*currentObstacle)->position;
-		if(diferencia.length() < radio + (*currentObstacle)->radio) {esFactible = false;}
-		++currentObstacle;
-	}
-
-	List<Defense*>::iterator currentDefense = defenses.begin();
-	while(esFactible && (*currentDefense)->id != (*defensa)->id){
-		Vector3 diferencia = Vector3(x,y,0) - (*currentDefense)->position;
-		if(diferencia.length() < radio + (*currentDefense)->radio) {esFactible = false;}
-		++currentDefense;
-	}
-	return esFactible;
+    for(int i = 0 ; i < cellsHeight ; ++i) {
+        for(int j = 0 ; j < cellsWidth ; ++j) {
+            Vector3 cellPosition = cellCenterToPosition(i, j, cellWidth, cellHeight);
+            float cost = 0;
+            if( (i+j) % 2 == 0 ) {
+                cost = cellWidth * 100;
+            }
+            
+            additionalCost[i][j] = cost;
+        }
+    }
 }
 
-void DEF_LIB_EXPORTED calculateAdditionalCost(float** additionalCost
+void DEF_LIB_EXPORTED NOcalculateAdditionalCost(float** additionalCost
                    , int cellsWidth, int cellsHeight, float mapWidth, float mapHeight
                    , List<Object*> obstacles, List<Defense*> defenses) {
     
@@ -105,26 +87,25 @@ void DEF_LIB_EXPORTED calculateAdditionalCost(float** additionalCost
             while((toca)*cellWidth > ejex){
                 toca--;
             }
-            //CAMBIAR 99 A INF PARA ENTREGAR
             for(int x = -toca; x<toca;x++){
                 if(row+i < cellsHeight && col+x > 0 && col+x < cellsWidth){
-                    additionalCost[row+i][col+x] = 999; //podrias poner null, INF para casillas de abajo del circulo
+                    additionalCost[row+i][col+x] = INF_F; //podrias poner null, INF para casillas de abajo del circulo
                 }
           
                 if(row-i > 0 && col+x > 0 && col+x < cellsWidth){
-                    additionalCost[row-i][col+x] = 999; //pone en INF casillas de arriba
+                    additionalCost[row-i][col+x] = INF_F; //pone en INF casillas de arriba
                 }
             }
         }//la idea es que el obstaculo inutiliza las casillas desde su centro en un radio
         }else{
           
-            additionalCost[row][col] = 999; //si solo ocupa la casilla central -> poner esa en INF
+            additionalCost[row][col] = INF_F; //si solo ocupa la casilla central -> poner esa en INF
         }
         
 
 		++currentObstacle;
 	}
-    
+    /*
     //LAS DEFENSAS UN COSTE ALTO Y SUS ALREDEDORES MEDIO
     //se debe evitar las defensas lo maximo posible
     List<Defense*>::iterator currentDefense = defenses.begin();
@@ -139,14 +120,16 @@ void DEF_LIB_EXPORTED calculateAdditionalCost(float** additionalCost
         if (fila< cellsHeight) additionalCost[fila+1][columna] = additionalCost[fila][columna] + 10; //abajo
 		++currentDefense;
 	}
-    
-    showcosts(additionalCost,cellsWidth,cellsHeight);
+    */
    
+}
+void fgh(AStarNode* n, const AStarNode* origin, const AStarNode* target){
+
+
 }
 
 AStarNode* extrae_mejor(std::list<AStarNode*> abiertas){//ya veer
     List<AStarNode*>::iterator it=abiertas.begin();
-    int count = 0;
     AStarNode *mejor;
     //AStarNode*;
     float min = INF_F; float aux;
@@ -157,10 +140,16 @@ AStarNode* extrae_mejor(std::list<AStarNode*> abiertas){//ya veer
             mejor = *it; //count;
         }
         it++;
-        count++;
     }
     return mejor;
 } 
+
+bool dentrode(std::list<AStarNode*> lista, AStarNode* busqueda){
+    for (auto nodo : lista){
+        if (nodo == busqueda)
+            return true;}
+     return false;
+}
 
 void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
                    , int cellsWidth, int cellsHeight, float mapWidth, float mapHeight
@@ -169,83 +158,69 @@ void DEF_LIB_EXPORTED calculatePath(AStarNode* originNode, AStarNode* targetNode
     float cellWidth = mapWidth / cellsWidth;
     float cellHeight = mapHeight / cellsHeight;
     //notas: cellsWidth es nº casillas de ancho, mapWidth tam en u de ancho. y su division el tam de una casilla
-
     
-    int maxIter = cellsHeight*cellsWidth;
-    List<AStarNode *> abiertas;
-    abiertas.push_back(originNode);
-    List<AStarNode *> cerradas; // vacia I guess
-    AStarNode *c = originNode;
-    while (c != targetNode &&  !abiertas.empty() && maxIter > 0)
-    {
-        float min = INF_F; // maximo posible para un float jsjs
-        // AStarNode* k = (); //no recuerdo que es
-        AStarNode *o = NULL; // no se pa que sirve
+    int maxIter = 0; //no se si usarlo
+    float ** camino = new float*[cellsHeight]; 
 
-        //extrae mejor 
-        c = extrae_mejor(abiertas);
-        std::cout << c->position.x << " "  << c->position.y << " " << c->F << " " << c->G << " " << c->H << std::endl;
-        abiertas.remove(c); //se elimina mejor de abiertas
-        cerradas.push_back(c); //add current to closed
-
-
-
-        
-    }
-    
-
-    float ** camino = new float*[cellsHeight];
     for (int i = 0; i < cellsHeight; ++i) {
         camino[i] = new float[cellsWidth]{};
     }
 
-    maxIter = 100; 
-    AStarNode* current = originNode;
-    printf("height:%i width:%i\n",cellsHeight,cellsWidth);
-    while(current != targetNode && maxIter > 0) { // @todo ensure current and target are connected
-	    float min = INF_F;
-	    AStarNode* o = NULL;    
-	    for (List<AStarNode*>::iterator it=current->adjacents.begin(); it != current->adjacents.end(); ++it) {
-		    float dist = _sdistance((*it)->position, targetNode->position);
+    List<AStarNode *> abiertas;
+    abiertas.push_front(originNode);
+    List<AStarNode *> cerradas; // vacia I guess
+    AStarNode *c = originNode;
+    //fgh manualmente
+    c->G = 0.0f; 
+    c->H = _sdistance(c->position, targetNode->position);
+    c->F = c->H;
+    float coste; //para guardar coste de distancia y obstaculos
+    int i,j;
+    
+    while (c != targetNode &&  !abiertas.empty())
+    {
+
+        float min = INF_F; // maximo posible para un float jsjs
+        // AStarNode* k = (); //no recuerdo que es
+        //AStarNode *o = NULL; // no se pa que sirve
+
+        //extrae mejor 
+        c = extrae_mejor(abiertas);
+        abiertas.remove(c); //se elimina mejor de abiertas
+        cerradas.push_back(c); //add current to closed
+        //IFFFFFFF
+        path.push_back(c->position);
+        
+        for(List<AStarNode*>::iterator it = c->adjacents.begin(); it != c->adjacents.end(); ++it){
+            positionToCell((*it)->position,i,j,cellWidth,cellHeight);
             
-            if(additionalCost != NULL) { //se puede usar para obstaculos y tal
-                dist += additionalCost[(int)((*it)->position.y / cellsHeight)][(int)((*it)->position.x / cellsWidth)];
+            coste = c->G + cellWidth; //sabemos que tam celda de ancho y largo son iguales
+            (*it)->H = additionalCost[i][j] + _sdistance((*it)->position, targetNode->position) ;
+            (*it)->F = (*it)->G + (*it)->H;
+            if( (dentrode(abiertas,(*it)) || dentrode(cerradas,(*it)) ) && coste < (*it)->G){
+                abiertas.remove(*it);
+                cerradas.remove(*it); //esto lo puedo quitar porque no pasa nunca (con una buena heurisitca)
             }
-		    //std::cout << "1. " << (*it)->position.y << ", " << (*it)->position.x << "\n" << std::endl;
-            //std::cout << "2. " << (*it)->position.y / cellsHeight<< ", " << (*it)->position.x/ cellsWidth << "\n" << std::endl;
-            //std::cout << "3. " << ((*it)->position.y - cellHeight*0.5)/cellHeight<< ", " << ((*it)->position.x - cellWidth*0.5)/cellWidth << "\n" << std::endl;
             
-		    if(dist < min) {
-			    min = dist;
-                //std::cout << min << " " << std::endl;
-			    o = (*it);
-		    }
-	    }
-
-	    current = o;
-
-        if(current == NULL) {
-            break;
+            if( !dentrode(abiertas,(*it)) && !dentrode(cerradas,(*it)) )  
+            {
+                (*it)->G = coste;
+                abiertas.push_back(*it);
+                //set priority quere rank to g(it) + h(it)
+                (*it)->parent = c;
+            }
         }
-
-        path.push_back(current->position);
-        camino[(int)((current->position.y - cellHeight*0.5)/cellHeight)][(int)((current->position.x - cellWidth*0.5)/cellWidth)] = maxIter;
-        --maxIter;
     }
     /*
-    camino[(int)((targetNode->position.y - cellHeight*0.5)/cellHeight)][(int)((targetNode->position.x - cellWidth*0.5)/cellWidth)] = -1;
-    for (int i = 0; i < cellsHeight; ++i) {
-        for (int j = 0; j < cellsWidth; ++j) {
-            std::cout << camino[i][j] << " ";
-        }
-        std::cout << std::endl;
+    //recupera camino
+    if(c == targetNode) {
+        auto n = targetNode;
+        while(n != originNode){
+            path.push_back(c->position);
+            n = n->parent;
     }
-    printf("\n\n\n");
-    */
-    //show_costs(camino,cellsWidth,cellsHeight);
-
+    
+}*/
 }
-//Esta funcion es feisima
-//
 
 
